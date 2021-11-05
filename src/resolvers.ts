@@ -14,8 +14,8 @@ export const characters = async (req: Request, res: Response) => {
     .limit(pageSize)
     .skip(pageSize * (page - 1))
     .toArray();
-    res.status(200).json(chars);
-  res.status(400).json({Error:"Not logged in"});
+  res.status(200).json(chars);
+  res.status(400).json({ Error: "Not logged in" });
 };
 
 export const character = async (req: Request, res: Response) => {
@@ -27,28 +27,29 @@ export const character = async (req: Request, res: Response) => {
 };
 
 export const register = async (req: Request, res: Response) => {
+  console.log("Hola")
   const username = req.query.username;
   const password = req.query.password;
   const db: Db = req.app.get("db");
-  const user = await db.collection("R_users").findOne({username:username});
-  if(!user){
+  const user = await db.collection("R_users").findOne({ username: username });
+  if (!user) {
     db.collection("R_users").insertOne({
       username: username,
       password: password
     });
     res.status(200).json({
-      Status:res.statusCode,
+      Status: res.statusCode,
       Message: "Usuario creado",
       Usuario: username
     });
   }
-  else{
-    res.status(409).json({Error:"User already created"})
+  else {
+    res.status(409).json({ Error: "User already created" })
   }
 
-  
-  
-}; 
+
+
+};
 
 export const login = async (req: Request, res: Response) => {
   const db: Db = req.app.get("db");
@@ -56,43 +57,40 @@ export const login = async (req: Request, res: Response) => {
   const password = req.query.password;
   const uiid_new = uuidv4()
   try {
-    const user = await db.collection("R_users").findOneAndUpdate({username:username,password:password},{'$set':{uiid:uiid_new}});
-    if(!user){
+    const user = await db.collection("R_users").findOneAndUpdate({ username: username, password: password }, { '$set': { uiid: uiid_new } });
+    if (!user) {
       res.status(404).json({
         Status: 404,
-        Error:"User not found"
+        Error: "User not found"
       });
     }
-    else{
+    else {
       res.status(200).json({
         Status: 200,
-        Username:req.query.username,
-        Uiid:uiid_new,
+        Username: req.query.username,
+        Uiid: uiid_new,
 
       });
     }
     res.json(400).json({
-      Error:"Not logged in"
+      Error: "Not logged in"
     });
   } catch (e) {
-    throw(e);
+    throw (e);
   }
 };
 
 
 export const signout = async (req: Request, res: Response) => {
   const db: Db = req.app.get("db");
-  const username = req.query.username;
-  const password = req.query.password;
   try {
-    const user = await db.collection("R_users").findOneAndUpdate({username:username,password:password},{'$set':{uiid:null}});
+    const user = await db.collection("R_users").findOneAndUpdate({ uiid: req.headers.uiid }, { '$set': { uiid: null } });
   } catch (e) {
-    throw(e);
+    throw (e);
   }
   res.status(200).json({
-    Status:res.statusCode,
+    Status: res.statusCode,
     Message: "Sign out",
-    Usuario: username
   });
 };
 
@@ -102,12 +100,12 @@ export const delete_aco = async (req: Request, res: Response) => {
   const username = req.query.username;
   const password = req.query.password;
   try {
-    const user = await db.collection("R_users").findOneAndDelete({username:username,password:password,uiid:req.headers.uiid});
+    const user = await db.collection("R_users").findOneAndDelete({ username: username, password: password, uiid: req.headers.uiid });
   } catch (e) {
-    throw(e);
+    throw (e);
   }
   res.status(200).json({
-    Status:res.statusCode,
+    Status: res.statusCode,
     Message: "Account deleted",
     Usuario: username
   });
