@@ -97,16 +97,13 @@ export const signout = async (req: Request, res: Response) => {
 
 export const delete_aco = async (req: Request, res: Response) => {
   const db: Db = req.app.get("db");
-  const username = req.query.username;
-  const password = req.query.password;
   try {
-    const user = await db.collection("R_users").findOneAndDelete({ username: username, password: password, uiid: req.headers.uiid });
+    const user = await db.collection("R_users").findOneAndDelete({ uiid: req.headers.uiid });
   } catch (e) {
     throw (e);
   }
   res.status(200).json({
     Status: res.statusCode,
     Message: "Account deleted",
-    Usuario: username
   });
 };
